@@ -8,7 +8,8 @@
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@aincrad/server": ["../server/src/index.ts"]
     }
   }
 }

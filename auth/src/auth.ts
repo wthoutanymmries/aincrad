@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
-import { PrismaClient } from '../../prisma/generated/prisma/client.js'
+import { PrismaClient } from '@aincrad/database'
 import { PrismaPg } from '@prisma/adapter-pg'
 
 import "dotenv/config"
@@ -32,4 +32,20 @@ export const auth = betterAuth({
   //     clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
   //   },
   // },
+  user: {
+    additionalFields: {
+      surname: {
+        type: 'string',
+        required: true,
+      },
+      patronymic: {
+        type: 'string',
+        required: true,
+      },
+      managerId: {
+        type: 'string',
+        required: false,
+      },
+    },
+  },
 })

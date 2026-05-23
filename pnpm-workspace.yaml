@@ -2,4 +2,5 @@ packages:
   - 'server'
   - 'client'
   - 'auth'
+  - 'database'
 # minimumReleaseAge: 10080

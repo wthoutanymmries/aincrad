@@ -1,7 +1,7 @@
 import { Elysia, type Context } from 'elysia'
 import { cors } from '@elysia/cors'
 import { node } from '@elysia/node'
-import { auth } from './lib/auth.js'
+import { auth } from '@aincrad/auth'
 
 const betterAuthView = async (context: Context) => {
 	const BETTER_AUTH_ACCEPT_METHODS = ["POST", "GET"]
@@ -20,6 +20,23 @@ const betterAuthView = async (context: Context) => {
 	}
 }
 
+const betterAuth = new Elysia({ name: 'better-auth' })
+  .all("/api/auth/*", betterAuthView)
+	.macro({
+		auth: {
+			async resolve({ status, request: { headers } }) {
+				const session = await auth.api.getSession({ headers })
+
+				if (!session) return status(401)
+
+				return {
+					user: session.user,
+					session: session.session
+				}
+			}
+		}
+	})
+
 const app = new Elysia({ adapter: node() })
 	.use(
 			cors({
@@ -30,13 +47,26 @@ const app = new Elysia({ adapter: node() })
 			})
 	)
 	// .use(cors())
-	.all("/api/auth/*", betterAuthView)
+	// .all("/api/auth/*", betterAuthView)
+	.use(betterAuth)
 	.get('/', () => {
     console.log('elysia')
     return 'Hello Elysia'
   })
+	.get(
+		'/user',
+		({ user }) => {
+			console.log('User from context:', user)
+			return user
+		},
+		{
+			auth: true
+    }
+	)
 	.listen(3000, ({ hostname, port }) => {
 		console.log(
 			`🦊 Elysia is running at ${hostname}:${port}`
 		)
 	})
+
+export type App = typeof app

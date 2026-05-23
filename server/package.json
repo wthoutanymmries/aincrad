@@ -1,19 +1,30 @@
 {
-  "name": "server",
+  "name": "@aincrad/server",
   "version": "1.0.0",
   "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc src/index.ts --outDir dist",
+    "build": "tsc -p tsconfig.json",
     "start": "NODE_ENV=production node dist/index.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types.js",
+      "types": "./dist/types.d.ts"
+    }
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.24.0",
   "dependencies": {
+    "@aincrad/auth": "workspace:*",
     "@elysia/cors": "^1.4.2",
     "@elysia/node": "^1.4.6",
     "@prisma/adapter-pg": "^7.8.0",
