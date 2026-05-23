@@ -74,36 +74,32 @@ export function NavMain({
 
   const handleGetUser = async () => {
     try {
-      const { data, error } = await authClient.signIn.email({
-        /**
-         * The user email
-         */
-        email: '123@test.com',
-        /**
-         * The user password
-         */
-        password: 'password',
-        /**
-         * A URL to redirect to after the user verifies their email (optional)
-         */
-        // callbackURL: "/dashboard",
-        /**
-         * remember the user session after the browser is closed. 
-         * @default true
-         */
-        rememberMe: false
-      }, {
-          //callbacks
-      })
+      // const { data, error } = await authClient.signIn.email({
+      //   /**
+      //    * The user email
+      //    */
+      //   email: '123@test.com',
+      //   /**
+      //    * The user password
+      //    */
+      //   password: 'password',
+      //   /**
+      //    * A URL to redirect to after the user verifies their email (optional)
+      //    */
+      //   // callbackURL: "/dashboard",
+      //   /**
+      //    * remember the user session after the browser is closed. 
+      //    * @default true
+      //    */
+      //   rememberMe: false
+      // }, {
+      //     //callbacks
+      // })
 
-      console.log({ data })
-      console.log({ error })
+      // console.log({ data })
+      // console.log({ error })
 
-      const response = await apiClient.user.get({
-        headers: {
-          authorization: `Bearer ${data?.token}`
-        },
-      })
+      const response = await apiClient.user.get()
       console.log('User:', response.data)
     } catch (error) {
       console.error('Failed to fetch user:', error)
