@@ -5,8 +5,15 @@ model User {
   surname    String
   patronymic String
 
-  login    String @unique
-  password String
+  // login    String @unique
+  // password String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
 
   managerId String?
   manager   User?   @relation("UserReportsTo", fields: [managerId], references: [id])
@@ -14,4 +21,7 @@ model User {
 
   authoredTasks Task[] @relation("AuthorTasks")
   managedTasks  Task[] @relation("ManagerTasks")
+
+  @@unique([email])
+  @@map("user")
 }

@@ -1,5 +1,3 @@
-"use client"
-
 import { ChevronRight, type LucideIcon } from "lucide-react"
 
 import {
@@ -20,6 +18,8 @@ import {
 } from "@/components/ui/sidebar"
 import { Button } from "./ui/button"
 
+import { authClient } from "@/src/lib/auth-client"
+
 export function NavMain({
   items,
 }: {
@@ -34,9 +34,49 @@ export function NavMain({
     }[]
   }[]
 }) {
+  const onSignUp = async ({
+    email,
+    password,
+    name,
+    image,
+  }: {
+    email: string
+    password: string
+    name: string
+    image?: string
+  }) => {
+    const { data, error } = await authClient.signUp.email({
+        email, // user email address
+        password, // user password -> min 8 characters by default
+        name, // user display name
+        image, // User image URL (optional)
+        callbackURL: "/dashboard" // A URL to redirect to after the user verifies their email (optional)
+    }, {
+        onRequest: (ctx) => {
+            //show loading
+        },
+        onSuccess: (ctx) => {
+            //redirect to the dashboard or sign in page
+            console.log("User signed up successfully", ctx.data);
+        },
+        onError: (ctx) => {
+            // display the error message
+            alert(ctx.error.message);
+        },
+    })
+
+    console.log({ data })
+    console.log({ error })
+  }
+
+
   return (
     <SidebarGroup>
-      <Button>Create</Button>
+      <Button
+        onClick={async () => await onSignUp({ email: '123@test.com', name: 'name3', password: 'password' })}
+      >
+        Create
+      </Button>
       <SidebarGroupLabel>Manage subordinates</SidebarGroupLabel>
       {/* <SidebarMenu>
         {items.map((item) => (
