@@ -1,25 +1,39 @@
+import {
+  Plus
+} from 'lucide-react'
 import { createFileRoute } from '@tanstack/react-router'
 import { AppSidebar } from '@/components/app-sidebar'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
+// import {
+//   Breadcrumb,
+//   BreadcrumbItem,
+//   BreadcrumbLink,
+//   BreadcrumbList,
+//   BreadcrumbPage,
+//   BreadcrumbSeparator,
+// } from '@/components/ui/breadcrumb'
 import { Separator } from '@/components/ui/separator'
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
+import { Button } from '@/components/ui/button'
+import { apiClient } from '../lib/api-client'
 
 export const Route = createFileRoute('/')({
   component: Index,
 })
 
 function Index() {
+  const handleGetUser = async () => {
+    try {
+      const response = await apiClient.user.get()
+      console.log('User:', response.data)
+    } catch (error) {
+      console.error('Failed to fetch user:', error)
+    }
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -29,9 +43,9 @@ function Index() {
             <SidebarTrigger className='-ml-1' />
             <Separator
               orientation='vertical'
-              className='mr-2 data-[orientation=vertical]:h-4'
+              className='mr-2 data-[orientation=vertical]:h-6'
             />
-            <Breadcrumb>
+            {/* <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className='hidden md:block'>
                   <BreadcrumbLink href='#'>
@@ -43,8 +57,12 @@ function Index() {
                   <BreadcrumbPage>Data Fetching</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
-            </Breadcrumb>
+            </Breadcrumb> */}
           </div>
+          <Button className='ml-auto mr-4' onClick={handleGetUser}>
+            <Plus />
+            Create
+          </Button>
         </header>
         <div className='flex flex-1 flex-col gap-4 p-4 pt-0'>
           <div className='grid auto-rows-min gap-4 md:grid-cols-3'>

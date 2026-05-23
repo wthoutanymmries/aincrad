@@ -12,7 +12,7 @@ function RouteComponent() {
   const navigate = useNavigate()
 
   const handleSignup = async (formData: TSignUpFormData) => {
-    const { data, error } = await authClient.signUp.email({
+    await authClient.signUp.email({
       email: formData.email,
       password: formData.password,
       name: formData.name,
@@ -26,16 +26,12 @@ function RouteComponent() {
           // loading
         },
         onSuccess: (ctx) => {
-          console.log('User signed up successfully', ctx.data)
           navigate({ to: '/'})
         },
         onError: (ctx) => {
           toast.error(ctx.error.message || 'An error occurred during sign up')
         },
     })
-
-    console.log({ data })
-    console.log({ error })
   }
   return (
     <div className='grid min-h-svh lg:grid-cols-2'>

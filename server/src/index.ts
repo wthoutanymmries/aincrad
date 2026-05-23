@@ -3,16 +3,12 @@ import { cors } from '@elysia/cors'
 import { node } from '@elysia/node'
 import { auth } from '@aincrad/auth'
 
+// https://better-auth.com/docs/installation#mount-handler
 const betterAuthView = async (context: Context) => {
 	const BETTER_AUTH_ACCEPT_METHODS = ["POST", "GET"]
 
-	const origin = context.request.headers.get('origin')
-	console.log('Auth request Origin:', origin)
-
-	// validate request method
 	if (BETTER_AUTH_ACCEPT_METHODS.includes(context.request.method)) {
 		const res = await auth.handler(context.request)
-		console.log('Auth handler response status:', res?.status)
 		return res
 	}
 	else {
@@ -22,6 +18,7 @@ const betterAuthView = async (context: Context) => {
 
 const betterAuth = new Elysia({ name: 'better-auth' })
   .all("/api/auth/*", betterAuthView)
+	// https://elysiajs.com/integrations/better-auth
 	.macro({
 		auth: {
 			async resolve({ status, request: { headers } }) {
@@ -46,17 +43,10 @@ const app = new Elysia({ adapter: node() })
 				allowedHeaders: ['Content-Type', 'Authorization']
 			})
 	)
-	// .use(cors())
-	// .all("/api/auth/*", betterAuthView)
 	.use(betterAuth)
-	.get('/', () => {
-    console.log('elysia')
-    return 'Hello Elysia'
-  })
 	.get(
 		'/user',
 		({ user }) => {
-			console.log('User from context:', user)
 			return user
 		},
 		{

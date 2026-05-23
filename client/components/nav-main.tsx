@@ -1,4 +1,4 @@
-import { type LucideIcon } from 'lucide-react'
+import { type LucideIcon, SearchIcon } from 'lucide-react'
 
 // import {
 //   Collapsible,
@@ -16,10 +16,15 @@ import {
   // SidebarMenuSubButton,
   // SidebarMenuSubItem,
 } from '@/components/ui/sidebar'
-import { Button } from './ui/button'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group"
+import { ScrollArea } from "@/components/ui/scroll-area"
+// import { Button } from './ui/button'
 
-// import { authClient } from '@/src/lib/auth-client'
-import { apiClient } from '@/src/lib/api-client'
+// import { apiClient } from '@/src/lib/api-client'
 
 export function NavMain({
   items,
@@ -36,23 +41,53 @@ export function NavMain({
   }[]
 }) {
 
-  const handleGetUser = async () => {
-    try {
-      const response = await apiClient.user.get()
-      console.log('User:', response.data)
-    } catch (error) {
-      console.error('Failed to fetch user:', error)
-    }
-  }
-
   return (
     <SidebarGroup>
-      <Button
-        onClick={handleGetUser}
-      >
-        Create
-      </Button>
-      <SidebarGroupLabel>Manage subordinates</SidebarGroupLabel>
+      <div className='fixed top-18 left-4 w-56 bg-primary-foreground z-50'>
+        <SidebarGroupLabel>Manage subordinates</SidebarGroupLabel>
+        <InputGroup className='mb-1'>
+          <InputGroupInput id="inline-start-input" placeholder="Search..." />
+          <InputGroupAddon align="inline-start">
+            <SearchIcon className="text-muted-foreground" />
+          </InputGroupAddon>
+        </InputGroup>
+      </div>
+      <ScrollArea className='mt-18 mb-5'>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+        <div className='h-8 border rounded-sm mb-1'></div>
+      </ScrollArea>
       {/* <SidebarMenu>
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
