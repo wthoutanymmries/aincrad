@@ -1,0 +1,31 @@
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum Status {
+  TO_BE_DONE
+  IN_PROGRESS
+  FINISHED
+  CANCELED
+}
+
+model Task {
+  id String @id @default(cuid())
+
+  title        String
+  descripttion String
+
+  createdAt DateTime
+  updatedAt DateTime
+  endsAt    DateTime
+
+  priority Priority
+  status   Status
+
+  author    User    @relation("AuthorTasks", fields: [authorId], references: [id])
+  authorId  String
+  manager   User?   @relation("ManagerTasks", fields: [managerId], references: [id])
+  managerId String?
+}

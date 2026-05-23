@@ -1,0 +1,17 @@
+model User {
+  id String @id @default(cuid())
+
+  name       String
+  surname    String
+  patronymic String
+
+  login    String @unique
+  password String
+
+  managerId String?
+  manager   User?   @relation("UserReportsTo", fields: [managerId], references: [id])
+  reports   User[]  @relation("UserReportsTo")
+
+  authoredTasks Task[] @relation("AuthorTasks")
+  managedTasks  Task[] @relation("ManagerTasks")
+}

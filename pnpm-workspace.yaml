@@ -1,4 +1,4 @@
 packages:
   - 'server'
   - 'client'
-minimumReleaseAge: 10080
+# minimumReleaseAge: 10080
