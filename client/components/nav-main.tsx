@@ -1,4 +1,4 @@
-import { type LucideIcon, SearchIcon } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 
 // import {
 //   Collapsible,
@@ -29,34 +29,26 @@ import type { User } from '../../database/dist/prisma/generated/prisma/client'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { authClient } from '@/src/lib/auth-client'
 import { Switch } from './ui/switch'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from './ui/alert-dialog'
 
 export function NavMain() {
-  const [user, setUser] = useState<User>()
   const [users, setUsers] = useState<User[]>([])
   const [search, setSearch] = useState('')
   const [alertDialogOpen, setAlertDialogOpen] = useState(false)
   const [alertDialogDescription, setAlertDialogDescription] = useState('')
   const [subordinate, setSubordinate] = useState<User>()
 
-  useEffect(() => {
-    let session: ReturnType<typeof authClient.getSession> | null = null
-
-    const fetchSession = async () => {
-      try {
-        session = await authClient.getSession()
-      }
-      catch (error) {
-        console.error('Failed to fetch session:', error)
-      }
-      
-      if (session.data?.user) {
-        setUser(session.data.user)
-      }
-    }
-
-    fetchSession()
-  }, [])
+  const { data: session } = authClient.useSession()
+  const user = session?.user
 
   const fetchUsers = async () => {
     try {
@@ -67,7 +59,6 @@ export function NavMain() {
       }
 
       setUsers(data)
-      console.log('Users:', data)
     }
     catch (error) {
       toast.warning('Failed to fetch users', {

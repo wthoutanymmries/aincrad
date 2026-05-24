@@ -14,19 +14,18 @@ enum Status {
 model Task {
   id String @id @default(cuid())
 
-  title         String
-  descripttion  String
-  madeByManager Boolean @default(false)
+  title        String
+  description String
 
-  createdAt DateTime
-  updatedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   endsAt    DateTime
 
   priority Priority
-  status   Status
+  status   Status   @default(TO_BE_DONE)
 
-  author    User    @relation("AuthorTasks", fields: [authorId], references: [id])
-  authorId  String
+  author    User    @relation("AuthorTasks", fields: [ownerId], references: [id])
+  ownerId  String
   manager   User?   @relation("ManagerTasks", fields: [managerId], references: [id])
   managerId String?
 }

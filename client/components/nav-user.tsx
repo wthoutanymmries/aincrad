@@ -29,35 +29,14 @@ import {
 } from '@/components/ui/sidebar'
 import { authClient } from '@/src/lib/auth-client'
 import { useNavigate } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
 import { Skeleton } from './ui/skeleton'
 import { toast } from 'sonner'
 export function NavUser() {
-  const { isMobile } = useSidebar()
   const navigate = useNavigate()
-  const [user, setUser] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const { isMobile } = useSidebar()
+  const { data: session, isPending } = authClient.useSession()
 
-  useEffect(() => {
-    let session: ReturnType<typeof authClient.getSession> | null = null
-
-    const fetchSession = async () => {
-      try {
-        session = await authClient.getSession()
-      }
-      catch (error) {
-        console.error('Failed to fetch session:', error)
-      }
-      
-      if (session.data?.user) {
-        setUser(session.data.user)
-      }
-
-      setTimeout(() => setIsLoading(false), 300)
-    }
-
-    fetchSession()
-  }, [])
+  const user = session?.user
 
   const handleLogOut = async () => {
     let data = null
@@ -67,7 +46,8 @@ export function NavUser() {
       const response = await authClient.signOut()
       data = response.data
       error = response.error
-    } catch (error) {
+    }
+    catch (error) {
       toast('Failed to sign out', {
         description: 'Please try again later',
         action: {
@@ -92,7 +72,7 @@ export function NavUser() {
               size='lg'
               className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
             >
-              {isLoading || !user
+              {isPending || !user
                 ? <Skeleton className='h-8 w-8 rounded-full'/>
                 : <Avatar className='h-8 w-8 rounded-lg'>
                     <AvatarImage
@@ -102,7 +82,7 @@ export function NavUser() {
                     <AvatarFallback className='rounded-lg'>CN</AvatarFallback>
                   </Avatar>}
               
-              {isLoading || !user
+              {isPending || !user
                 ? <div className='space-y-2'>
                     <Skeleton className='h-4 w-[100px]' />
                     <Skeleton className='h-4 w-[100px]' />
@@ -118,7 +98,7 @@ export function NavUser() {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
 
-          {!isLoading && <>
+          {!isPending && user && <>
             <DropdownMenuContent
               className='w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg'
               side={isMobile ? 'bottom' : 'right'}

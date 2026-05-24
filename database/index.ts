@@ -1,6 +1,15 @@
 export { UserPlain, UserPlainInputCreate } from "./prisma/generated/prismabox/User"
 
-export { PrismaClient } from "./prisma/generated/prisma/client"
+export {
+  PrismaClient,
+  Priority,
+  Status,
+  Account,
+  Session,
+  Task,
+  User,
+  Verification,
+} from "./prisma/generated/prisma/client"
 export * from "./prisma/generated/prisma/client.js"
 export * from "./prisma/generated/prisma/internal/prismaNamespace.js"
 
@@ -9,7 +18,12 @@ export * from "./prisma/generated/prisma/internal/prismaNamespace.js"
 // const prisma = new PrismaClient({})
 
 // const users = await prisma.user.findMany()
-// prisma.user.update({
-//   where: { id: 'some-id' },
-//   data: { name: 'New Name' }
+// prisma.task.findMany({
+//   orderBy: {
+//     authorId: 'asc'
+//   },
+//   include: {
+//     author: true,
+//     manager: true,
+//   }
 // })
