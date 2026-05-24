@@ -19,7 +19,7 @@ const tasks = new Elysia({ name: 'tasks' })
 					include: {
 						author: true,
 						manager: true,
-					}
+					},
 				})
 				return tasks
 			}

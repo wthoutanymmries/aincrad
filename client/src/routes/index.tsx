@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Plus } from 'lucide-react'
+// import { Plus } from 'lucide-react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { AppSidebar } from '@/components/app-sidebar'
 import { Separator } from '@/components/ui/separator'
@@ -9,7 +9,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Button } from '@/components/ui/button'
+// import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils'
 import { apiClient } from '../lib/api-client'
 import { authClient } from '../lib/auth-client'
 import type { Priority, Status } from '@aincrad/database'
+import { TaskDialog } from '@/components/task-dialog'
 
 export const Route = createFileRoute('/')({
   component: Index,
@@ -151,10 +152,13 @@ function Index() {
               className='mr-2 data-[orientation=vertical]:h-6'
             />
           </div>
-          <Button className='ml-auto mr-4' onClick={handleCreateTask}>
+          {/* <Button className='ml-auto mr-4' onClick={handleCreateTask}>
             <Plus />
             Create
-          </Button>
+          </Button> */}
+          <div className='ml-auto mr-4'>
+            <TaskDialog />
+          </div>
         </header>
         <div className='flex flex-1 flex-col gap-4 p-4 pt-0'>
           <Table>

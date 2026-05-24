@@ -29,3 +29,18 @@ export const users = new Elysia({ name: 'users' })
       })
     }
   )
+  .get(
+    '/subordinates',
+    async ({ user }) => {
+      const users = await prisma.user.findMany({
+        where: {
+          managerId: user.id,
+        }
+      })
+
+      return users
+    },
+    {
+      auth: true,
+    }
+  )
