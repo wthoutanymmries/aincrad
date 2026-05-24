@@ -10,10 +10,23 @@ const tasks = new Elysia({ name: 'tasks' })
 	.use(betterAuthPlugin)
 	.get(
 		'/tasks',
-		async () => {
+		async ({ user }) => {
+			if (user.isManager) {
+				const tasks = await prisma.task.findMany({
+					orderBy: {
+						ownerId: 'asc'
+					},
+					include: {
+						author: true,
+						manager: true,
+					}
+				})
+				return tasks
+			}
+
 			const tasks = await prisma.task.findMany({
-				orderBy: {
-					ownerId: 'asc'
+				where: {
+					ownerId: user.id,
 				},
 				include: {
 					author: true,
