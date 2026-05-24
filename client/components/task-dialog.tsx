@@ -18,8 +18,11 @@ import { Plus, SearchIcon } from 'lucide-react'
 import { Textarea } from './ui/textarea'
 import { DatePicker } from './date-picker'
 import type { Priority, Status } from '@aincrad/database'
+import type { User } from '../../database/dist/prisma/generated/prisma/client'
 import { InputGroup, InputGroupAddon, InputGroupInput } from './ui/input-group'
 import { Separator } from './ui/separator'
+import { ScrollArea } from './ui/scroll-area'
+import { UserAvatar } from './user-avatar'
 import { authClient } from '@/src/lib/auth-client'
 import { apiClient } from '@/src/lib/api-client'
 import { toast } from 'sonner'
@@ -42,29 +45,38 @@ export function TaskDialog() {
   const { data: session } = authClient.useSession()
   const user = session?.user
 
+  const [subordinates, setSubordinates] = useState<User[]>([])
+  const [selectedSubordinateId, setSelectedSubordinateId] =
+    useState<string | null>(null)
+
+  const fetchSubordinates = async () => {
+    try {
+      const { data } = await apiClient.subordinates.get()
+      
+      if (!data) {
+        return
+      }
+
+      setSubordinates(data)
+    }
+    catch (error) {
+      toast.warning('Could not fetch the list of subordinates', {
+        description: 'Please try refreshing the page',
+        action: {
+          label: 'Close',
+          onClick: () => {},
+        },
+      })
+    }
+  }
+
   useEffect(() => {
-    if (!user || !user.isManager) {
+    if (!user?.isManager) {
       return
     }
 
-    const fetchSubordinates = async () => {
-      try {
-        const { data } = await apiClient.subordinates.get()
-        console.log({ data })
-      }
-      catch (error) {  
-        toast.warning('Could not fetch the list of subordinates', {
-          description: 'Please try refreshing the page',
-          action: {
-            label: 'Close',
-            onClick: () => {},
-          },
-        })
-      }
-    }
-
     void fetchSubordinates()
-  }, [user])
+  }, [user?.id, user?.isManager])
 
   const [title, setTitle] = useState('Pedro Duarte')
   const [description, setDescription] = useState('@peduarte')
@@ -72,6 +84,12 @@ export function TaskDialog() {
   const [status, setStatus] = useState<Status>('TO_BE_DONE')
   const [priority, setPriority] = useState<Priority>('MEDIUM')
   const [search, setSearch] = useState('')
+
+  const filteredSubordinates = subordinates.filter((s) => {
+    const query = search.toLowerCase().trim()
+    const fullName = `${s.name} ${s.patronymic} ${s.surname}`.toLowerCase()
+    return fullName.includes(query) || s.email.toLowerCase().includes(query)
+  })
 
   const handleTitleChange =
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,12 +107,24 @@ export function TaskDialog() {
     (value: string) => {
       setPriority(value as Priority)
     }
+  const handleSubordinateClick =
+    (value: User) => {
+      setSelectedSubordinateId(
+        selectedSubordinateId === value.id
+          ? null
+          : value.id
+      )
+    }
+  const handleTriggerPress =
+    async () => {
+      await fetchSubordinates()
+    }
 
   return (
     <Dialog>
       <form>
         <DialogTrigger asChild>
-          <Button>
+          <Button onClick={handleTriggerPress} >
             <Plus />
             Create
           </Button>
@@ -112,21 +142,48 @@ export function TaskDialog() {
                 <Label>Appoint a subordinate</Label>
                 <InputGroup className='mb-1' id='colleague-search'>
                   <InputGroupInput
-                    id="inline-start-input"
-                    placeholder="Search..."
+                    id='inline-start-input'
+                    placeholder='Search...'
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
-                  <InputGroupAddon align="inline-start">
-                    <SearchIcon className="text-muted-foreground" />
+                  <InputGroupAddon align='inline-start'>
+                    <SearchIcon className='text-muted-foreground' />
                   </InputGroupAddon>
                 </InputGroup>
+
+                <ScrollArea className='flex-1'>
+                  {filteredSubordinates.map((value) => (
+                    <button
+                      key={value.id}
+                      type='button'
+                      onClick={() => handleSubordinateClick(value)}
+                      className={cn(
+                        'flex flex-row gap-2 mb-2 w-full rounded-md p-1',
+                        'transition-colors hover:bg-accent',
+                        selectedSubordinateId === value.id && 'bg-accent',
+                      )}
+                    >
+                      <UserAvatar
+                        name={value.name}
+                        surname={value.surname}
+                        image={value.image}
+                      />
+                      <div className='grid flex-1 text-left text-sm leading-tight'>
+                        <span className='font-medium'>
+                          {value.name + ' ' + value.surname}
+                        </span>
+                        <span className='truncate text-xs'>{value.email}</span>
+                      </div>
+                    </button>
+                  ))}
+                </ScrollArea>
               </div>
 
               <Separator orientation='vertical' />
             </>}
 
-            <div className='h-full flex flex-col'>
+            <div className='h-full flex flex-col gap-2'>
               <DialogHeader>
                 <DialogTitle>Edit task</DialogTitle>
                 <DialogDescription>

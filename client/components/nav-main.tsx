@@ -1,20 +1,7 @@
 import { SearchIcon } from 'lucide-react'
-
-// import {
-//   Collapsible,
-//   CollapsibleContent,
-//   CollapsibleTrigger,
-// } from '@/components/ui/collapsible'
 import {
   SidebarGroup,
   SidebarGroupLabel,
-  // SidebarMenu,
-  // SidebarMenuAction,
-  // SidebarMenuButton,
-  // SidebarMenuItem,
-  // SidebarMenuSub,
-  // SidebarMenuSubButton,
-  // SidebarMenuSubItem,
 } from '@/components/ui/sidebar'
 import {
   InputGroup,
@@ -26,7 +13,7 @@ import { useEffect, useState } from 'react'
 import { apiClient } from '@/src/lib/api-client'
 import { toast } from 'sonner'
 import type { User } from '../../database/dist/prisma/generated/prisma/client'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { UserAvatar } from './user-avatar'
 import { authClient } from '@/src/lib/auth-client'
 import { Switch } from './ui/switch'
 import {
@@ -182,15 +169,11 @@ export function NavMain() {
 
           return (
             <div key={value.id} className='flex flex-row gap-2 mb-2'>
-              <Avatar className='h-8 w-8 rounded-lg'>
-                <AvatarImage
-                  src={value.image || '/avatars/shadcn.jpg'}
-                  alt={value.name}
-                />
-                <AvatarFallback className='rounded-lg'>
-                  {value.name[0].toUpperCase() + value.surname[0].toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar
+                name={value.name}
+                surname={value.surname}
+                image={value.image}
+              />
 
               <div className='grid flex-1 text-left text-sm leading-tight'>
                 <span className='truncate font-medium'>
@@ -227,43 +210,6 @@ export function NavMain() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      {/* <SidebarMenu>
-        {items.map((item) => (
-          <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={item.title}>
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </a>
-              </SidebarMenuButton>
-              {item.items?.length ? (
-                <>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuAction className='data-[state=open]:rotate-90'>
-                      <ChevronRight />
-                      <span className='sr-only'>Toggle</span>
-                    </SidebarMenuAction>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {item.items?.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
-                            <a href={subItem.url}>
-                              <span>{subItem.title}</span>
-                            </a>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </>
-              ) : null}
-            </SidebarMenuItem>
-          </Collapsible>
-        ))}
-      </SidebarMenu> */}
     </SidebarGroup>
   )
 }
