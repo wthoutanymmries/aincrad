@@ -18,12 +18,4 @@ export * from "./prisma/generated/prisma/internal/prismaNamespace.js"
 // const prisma = new PrismaClient({})
 
 // const users = await prisma.user.findMany()
-// prisma.task.findMany({
-//   orderBy: {
-//     authorId: 'asc'
-//   },
-//   include: {
-//     author: true,
-//     manager: true,
-//   }
-// })
+// prisma.task.update()

@@ -15,14 +15,16 @@ import {
 interface DatePickerProps {
   value?: Date
   onValueChange?: (date: Date | undefined) => void
+  disabled?: boolean
 }
 
-export function DatePicker({ value, onValueChange }: DatePickerProps) {
+export function DatePicker({ value, onValueChange, disabled }: DatePickerProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
+          disabled={disabled}
           data-empty={!value}
           className="w-[280px] justify-start text-left font-normal data-[empty=true]:text-muted-foreground"
         >

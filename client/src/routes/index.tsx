@@ -39,7 +39,7 @@ function StatusBadge({ status }: { status: Status }) {
     case 'FINISHED':
       return <Badge>Finished</Badge>
     case 'CANCELED':
-      return <Badge variant="destructive">Destructive</Badge>
+      return <Badge variant="destructive">Canceled</Badge>
   }
 }
 
@@ -141,12 +141,14 @@ function Index() {
               fetchTasks={fetchTasks}
               open={editOpen}
               onOpenChange={handleDialogOpenChange}
+              taskId={selectedTask?.id}
               defaultTitle={selectedTask?.title}
               defaultDescription={selectedTask?.description ?? undefined}
               defaultDueDate={selectedTask?.endsAt}
               defaultStatus={selectedTask?.status}
               defaultPriority={selectedTask?.priority}
               defaultSelectedSubordinateId={selectedTask?.ownerId}
+              defaultManagerId={selectedTask?.managerId}
             />
           </div>
         </header>

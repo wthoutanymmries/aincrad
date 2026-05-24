@@ -45,27 +45,32 @@ interface TaskDialogProps {
   fetchTasks?: () => Promise<void>
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  taskId?: string
   defaultTitle?: string
   defaultDescription?: string
   defaultDueDate?: Date
   defaultStatus?: Status
   defaultPriority?: Priority
   defaultSelectedSubordinateId?: string | null
+  defaultManagerId?: string | null
 }
 
 export function TaskDialog({
   fetchTasks,
   open: openProp,
   onOpenChange: onOpenChangeProp,
+  taskId,
   defaultTitle = '',
   defaultDescription = '',
   defaultDueDate = undefined,
   defaultStatus = 'TO_BE_DONE',
   defaultPriority = 'MEDIUM',
   defaultSelectedSubordinateId = null,
+  defaultManagerId = null,
 }: TaskDialogProps) {
   const { data: session } = authClient.useSession()
   const user = session?.user
+  const isReadOnly = !!defaultManagerId
 
   const isOpenControlled = openProp !== undefined
   const [internalOpen, setInternalOpen] = useState(false)
@@ -162,27 +167,39 @@ export function TaskDialog({
     }
   
   const handleCreateTask = async () => {
-      if (!session?.user) {
-        toast.warning('No user session found', {
-          description: 'Please log in to create a task',
-          action: {
-            label: 'Close',
-            onClick: () => {},
-          },
+    if (!session?.user) {
+      toast.warning('No user session found', {
+        description: 'Please log in to create a task',
+        action: {
+          label: 'Close',
+          onClick: () => {},
+        },
+      })
+      return
+    }
+
+    try {
+      if (taskId) {
+        await apiClient.tasks({ id: taskId }).patch({
+          title,
+          description,
+          managerId: defaultManagerId,
+          priority,
+          status,
+          endsAt: dueDate ?? null,
+          ownerId: selectedSubordinateId,
         })
-        return
       }
-
-      const managerId =
-        session.user.isManager
-          ? selectedSubordinateId
-            ? session.user.id
+      else {
+        const managerId =
+          session.user.isManager
+            ? selectedSubordinateId
+              ? session.user.id
+              : null
             : null
-          : null
-      const endsAt = dueDate ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-      const ownerId = selectedSubordinateId ?? session.user.id
+        const endsAt = dueDate ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        const ownerId = selectedSubordinateId ?? session.user.id
 
-      try {
         await apiClient.tasks.post({
           title,
           description,
@@ -192,13 +209,14 @@ export function TaskDialog({
           endsAt,
           ownerId,
         })
-      } catch (error) {
-        console.error('Failed to fetch user:', error)
       }
-      
-      await fetchTasks?.()
-      handleOpenChange(false)
+    } catch (error) {
+      console.error('Failed to save task:', error)
     }
+
+    await fetchTasks?.()
+    handleOpenChange(false)
+  }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -279,6 +297,7 @@ export function TaskDialog({
                     name='title'
                     value={title}
                     onChange={handleTitleChange}
+                    readOnly={isReadOnly}
                   />
                 </Field>
                 <Field>
@@ -288,11 +307,12 @@ export function TaskDialog({
                     name='username'
                     value={description}
                     onChange={handleDescriptionChange}
+                    readOnly={isReadOnly}
                   />
                 </Field>
                 <Field>
                   <Label>Due date</Label>
-                  <DatePicker value={dueDate} onValueChange={setDueDate} />
+                  <DatePicker value={dueDate} onValueChange={setDueDate} disabled={isReadOnly} />
                 </Field>
                 <Field>
                   <Label>Status</Label>
@@ -318,6 +338,7 @@ export function TaskDialog({
                     onValueChange={handlePriorityChange}
                     variant='default'
                     className='flex-wrap justify-start'
+                    disabled={isReadOnly}
                   >
                     {priorityOptions.map(({ value, label }) => (
                       <ToggleGroupItem key={value} value={value}>

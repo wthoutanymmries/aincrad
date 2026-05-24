@@ -45,7 +45,7 @@ const tasks = new Elysia({ name: 'tasks' })
 			const task = await prisma.task.create({
 				data: {
 					...body,
-				}
+				},
 			})
 			return task
 		},
@@ -59,6 +59,33 @@ const tasks = new Elysia({ name: 'tasks' })
 				priority: t.Enum(Priority),
 				status: t.Enum(Status),
 				endsAt: t.Date(),
+			})
+		}
+	)
+	.patch(
+		'/tasks/:id',
+		async ({ params: { id }, body }) => {
+			const task = await prisma.task.update({
+				where: {
+					id,
+				},
+				data: {
+					...body
+				},
+			})
+
+			return task
+		},
+		{
+			auth: true,
+			body: t.Object({
+				title: t.Nullable(t.String()),
+				description: t.Nullable(t.String()),
+				ownerId: t.Nullable(t.String()),
+				managerId: t.Nullable(t.String()),
+				priority: t.Nullable(t.Enum(Priority)),
+				status: t.Nullable(t.Enum(Status)),
+				endsAt: t.Nullable(t.Date()),
 			})
 		}
 	)
