@@ -43,21 +43,42 @@ const priorityOptions: { value: Priority; label: string }[] = [
 
 interface TaskDialogProps {
   fetchTasks?: () => Promise<void>
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  defaultTitle?: string
+  defaultDescription?: string
+  defaultDueDate?: Date
+  defaultStatus?: Status
+  defaultPriority?: Priority
+  defaultSelectedSubordinateId?: string | null
 }
 
-export function TaskDialog({ fetchTasks } : TaskDialogProps) {
+export function TaskDialog({
+  fetchTasks,
+  open: openProp,
+  onOpenChange: onOpenChangeProp,
+  defaultTitle = '',
+  defaultDescription = '',
+  defaultDueDate = undefined,
+  defaultStatus = 'TO_BE_DONE',
+  defaultPriority = 'MEDIUM',
+  defaultSelectedSubordinateId = null,
+}: TaskDialogProps) {
   const { data: session } = authClient.useSession()
   const user = session?.user
 
-  const [open, setOpen] = useState(false)
+  const isOpenControlled = openProp !== undefined
+  const [internalOpen, setInternalOpen] = useState(false)
+  const open = isOpenControlled ? openProp : internalOpen
+
   const [subordinates, setSubordinates] = useState<User[]>([])
   const [selectedSubordinateId, setSelectedSubordinateId] =
-    useState<string | null>(null)
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [dueDate, setDueDate] = useState<Date | undefined>(undefined)
-  const [status, setStatus] = useState<Status>('TO_BE_DONE')
-  const [priority, setPriority] = useState<Priority>('MEDIUM')
+    useState<string | null>(defaultSelectedSubordinateId)
+  const [title, setTitle] = useState(defaultTitle)
+  const [description, setDescription] = useState(defaultDescription)
+  const [dueDate, setDueDate] = useState<Date | undefined>(defaultDueDate)
+  const [status, setStatus] = useState<Status>(defaultStatus)
+  const [priority, setPriority] = useState<Priority>(defaultPriority)
   const [search, setSearch] = useState('')
 
   const fetchSubordinates = async () => {
@@ -125,18 +146,19 @@ export function TaskDialog({ fetchTasks } : TaskDialogProps) {
     }
   const setDefaults =
     () => {
-      setOpen(false)
       setSearch('')
       setPriority('MEDIUM')
       setStatus('TO_BE_DONE')
       setDueDate(undefined)
       setDescription('')
       setTitle('')
+      setSelectedSubordinateId(null)
     }
   const handleOpenChange =
-    (open: boolean) => {
-      setOpen(open)
-      setDefaults()
+    (next: boolean) => {
+      if (!isOpenControlled) setInternalOpen(next)
+      onOpenChangeProp?.(next)
+      if (!next) setDefaults()
     }
   
   const handleCreateTask = async () => {
@@ -175,16 +197,14 @@ export function TaskDialog({ fetchTasks } : TaskDialogProps) {
       }
       
       await fetchTasks?.()
-
-      setOpen(false)
-      setDefaults()
+      handleOpenChange(false)
     }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <form>
         <DialogTrigger asChild>
-          <Button onClick={handleTriggerPress} >
+          <Button onClick={handleTriggerPress}>
             <Plus />
             Create
           </Button>

@@ -56,11 +56,14 @@ function PriorityBadge({ priority }: { priority: Priority }) {
 
 function Index() {
   type Tasks = Awaited<ReturnType<typeof apiClient.tasks.get>>['data']
+  type Task = NonNullable<Tasks>[number]
   
   const navigate = useNavigate()
   const { data: session, error, isPending } = authClient.useSession()
   
   const [tasks, setTasks] = useState<Tasks>([])
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+  const [editOpen, setEditOpen] = useState(false)
   const now = new Date(Date.now())
   
 
@@ -111,6 +114,15 @@ function Index() {
     void fetchTasks()
   }, [])
 
+  const handleDialogOpenChange =
+    (open: boolean) => {
+      setEditOpen(open)
+
+      if (!open) {
+        setSelectedTask(null)
+      }
+    }
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -123,12 +135,19 @@ function Index() {
               className='mr-2 data-[orientation=vertical]:h-6'
             />
           </div>
-          {/* <Button className='ml-auto mr-4' onClick={handleCreateTask}>
-            <Plus />
-            Create
-          </Button> */}
           <div className='ml-auto mr-4'>
-            <TaskDialog fetchTasks={fetchTasks} />
+            <TaskDialog
+              key={selectedTask?.id ?? 'create'}
+              fetchTasks={fetchTasks}
+              open={editOpen}
+              onOpenChange={handleDialogOpenChange}
+              defaultTitle={selectedTask?.title}
+              defaultDescription={selectedTask?.description ?? undefined}
+              defaultDueDate={selectedTask?.endsAt}
+              defaultStatus={selectedTask?.status}
+              defaultPriority={selectedTask?.priority}
+              defaultSelectedSubordinateId={selectedTask?.ownerId}
+            />
           </div>
         </header>
         <div className='flex flex-1 flex-col gap-4 p-4 pt-0'>
@@ -149,7 +168,10 @@ function Index() {
               {tasks?.map((task) => (
                 <TableRow
                   key={task.id}
-                  // className='odd:bg-muted/30'
+                  onClick={() => {
+                    setSelectedTask(task)
+                    setEditOpen(true)
+                  }}
                 >
                   <TableCell>
                     <div className={cn(
