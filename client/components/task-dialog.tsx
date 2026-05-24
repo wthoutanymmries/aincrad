@@ -178,6 +178,16 @@ export function TaskDialog({
       return
     }
 
+    // pushed oout of the try/caatch for the reactt compiler optimization =w=
+    const managerId = session.user.isManager
+      ? selectedSubordinateId
+        ? session.user.id
+        : null
+      : null
+    const endsAt = dueDate ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    const endsAtPatch = dueDate ?? null
+    const ownerId = selectedSubordinateId ?? session.user.id
+
     try {
       if (taskId) {
         await apiClient.tasks({ id: taskId }).patch({
@@ -186,20 +196,11 @@ export function TaskDialog({
           managerId: defaultManagerId,
           priority,
           status,
-          endsAt: dueDate ?? null,
+          endsAt: endsAtPatch,
           ownerId: selectedSubordinateId,
         })
       }
       else {
-        const managerId =
-          session.user.isManager
-            ? selectedSubordinateId
-              ? session.user.id
-              : null
-            : null
-        const endsAt = dueDate ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-        const ownerId = selectedSubordinateId ?? session.user.id
-
         await apiClient.tasks.post({
           title,
           description,
