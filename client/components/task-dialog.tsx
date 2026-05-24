@@ -41,13 +41,24 @@ const priorityOptions: { value: Priority; label: string }[] = [
   { value: 'HIGH', label: 'High' },
 ]
 
-export function TaskDialog() {
+interface TaskDialogProps {
+  fetchTasks?: () => Promise<void>
+}
+
+export function TaskDialog({ fetchTasks } : TaskDialogProps) {
   const { data: session } = authClient.useSession()
   const user = session?.user
 
+  const [open, setOpen] = useState(false)
   const [subordinates, setSubordinates] = useState<User[]>([])
   const [selectedSubordinateId, setSelectedSubordinateId] =
     useState<string | null>(null)
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [dueDate, setDueDate] = useState<Date | undefined>(undefined)
+  const [status, setStatus] = useState<Status>('TO_BE_DONE')
+  const [priority, setPriority] = useState<Priority>('MEDIUM')
+  const [search, setSearch] = useState('')
 
   const fetchSubordinates = async () => {
     try {
@@ -77,13 +88,6 @@ export function TaskDialog() {
 
     void fetchSubordinates()
   }, [user?.id, user?.isManager])
-
-  const [title, setTitle] = useState('Pedro Duarte')
-  const [description, setDescription] = useState('@peduarte')
-  const [dueDate, setDueDate] = useState<Date | undefined>(undefined)
-  const [status, setStatus] = useState<Status>('TO_BE_DONE')
-  const [priority, setPriority] = useState<Priority>('MEDIUM')
-  const [search, setSearch] = useState('')
 
   const filteredSubordinates = subordinates.filter((s) => {
     const query = search.toLowerCase().trim()
@@ -119,9 +123,65 @@ export function TaskDialog() {
     async () => {
       await fetchSubordinates()
     }
+  const setDefaults =
+    () => {
+      setOpen(false)
+      setSearch('')
+      setPriority('MEDIUM')
+      setStatus('TO_BE_DONE')
+      setDueDate(undefined)
+      setDescription('')
+      setTitle('')
+    }
+  const handleOpenChange =
+    (open: boolean) => {
+      setOpen(open)
+      setDefaults()
+    }
+  
+  const handleCreateTask = async () => {
+      if (!session?.user) {
+        toast.warning('No user session found', {
+          description: 'Please log in to create a task',
+          action: {
+            label: 'Close',
+            onClick: () => {},
+          },
+        })
+        return
+      }
+
+      const managerId =
+        session.user.isManager
+          ? selectedSubordinateId
+            ? session.user.id
+            : null
+          : null
+      const endsAt = dueDate ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      const ownerId = selectedSubordinateId ?? session.user.id
+
+      try {
+        await apiClient.tasks.post({
+          title,
+          description,
+          managerId,
+          priority,
+          status,
+          endsAt,
+          ownerId,
+        })
+      } catch (error) {
+        console.error('Failed to fetch user:', error)
+      }
+      
+      await fetchTasks?.()
+
+      setOpen(false)
+      setDefaults()
+    }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <form>
         <DialogTrigger asChild>
           <Button onClick={handleTriggerPress} >
@@ -249,9 +309,9 @@ export function TaskDialog() {
               </FieldGroup>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button variant='outline'>Cancel</Button>
+                  <Button variant='outline' onClick={setDefaults}>Cancel</Button>
                 </DialogClose>
-                <Button type='submit'>Save changes</Button>
+                <Button type='submit' onClick={handleCreateTask}>Save changes</Button>
               </DialogFooter>
             </div>
           </div>

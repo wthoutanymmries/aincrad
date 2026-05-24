@@ -111,35 +111,6 @@ function Index() {
     void fetchTasks()
   }, [])
 
-
-  const handleCreateTask = async () => {
-    if (!session?.user) {
-      toast.warning('No user session found', {
-        description: 'Please log in to create a task',
-        action: {
-          label: 'Close',
-          onClick: () => {},
-        },
-      })
-      return
-    }
-
-    try {
-      const { data } = await apiClient.tasks.post({
-        title: 'New Task 3 =w=!',
-        description: 'This is MOST definittely a new task',
-        managerId: null,
-        priority: 'MEDIUM',
-        endsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        ownerId: session.user.id,
-      })
-
-      await fetchTasks()
-    } catch (error) {
-      console.error('Failed to fetch user:', error)
-    }
-  }
-
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -157,7 +128,7 @@ function Index() {
             Create
           </Button> */}
           <div className='ml-auto mr-4'>
-            <TaskDialog />
+            <TaskDialog fetchTasks={fetchTasks} />
           </div>
         </header>
         <div className='flex flex-1 flex-col gap-4 p-4 pt-0'>

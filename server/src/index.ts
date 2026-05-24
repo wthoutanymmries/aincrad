@@ -4,7 +4,7 @@ import { node } from '@elysia/node'
 import { betterAuthPlugin } from './plugins/better-auth.js'
 import { prisma } from './lib/prisma.js'
 import { users } from './slices/users.js'
-import { Priority } from '@aincrad/database'
+import { Priority, Status } from '@aincrad/database'
 
 const tasks = new Elysia({ name: 'tasks' })
 	.use(betterAuthPlugin)
@@ -42,16 +42,9 @@ const tasks = new Elysia({ name: 'tasks' })
 	.post(
 		'/tasks',
 		async ({ body}) => {
-			const { title, description, ownerId, managerId, priority, endsAt } = body
-
 			const task = await prisma.task.create({
 				data: {
-					title,
-					description,
-					ownerId,
-					managerId,
-					priority,
-					endsAt,
+					...body,
 				}
 			})
 			return task
@@ -64,6 +57,7 @@ const tasks = new Elysia({ name: 'tasks' })
 				ownerId: t.String(),
 				managerId: t.Nullable(t.String()),
 				priority: t.Enum(Priority),
+				status: t.Enum(Status),
 				endsAt: t.Date(),
 			})
 		}
