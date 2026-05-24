@@ -30,6 +30,8 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
-    "pg": "^8.21.0"
+    "elysia": "^1.4.28",
+    "pg": "^8.21.0",
+    "prismabox": "^1.1.26"
   }
 }

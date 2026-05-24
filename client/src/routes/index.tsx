@@ -1,7 +1,9 @@
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import {
   Plus
 } from 'lucide-react'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { AppSidebar } from '@/components/app-sidebar'
 // import {
 //   Breadcrumb,
@@ -19,16 +21,42 @@ import {
 } from '@/components/ui/sidebar'
 import { Button } from '@/components/ui/button'
 import { apiClient } from '../lib/api-client'
+import { authClient } from '../lib/auth-client'
 
 export const Route = createFileRoute('/')({
   component: Index,
 })
 
 function Index() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const getSessionStatus = async () => {
+      try {
+        const session = await authClient.getSession()
+
+        if (!session.data) {
+          navigate({ to: '/login' })
+        }
+      }
+      catch (error) {
+        toast.warning('Could not get session status', {
+          description: 'Please log in to continue',
+          action: {
+            label: 'Close',
+            onClick: () => {},
+          },
+        })
+      }
+    }
+
+    void getSessionStatus()
+  }, [])
+
   const handleGetUser = async () => {
     try {
-      const response = await apiClient.user.get()
-      console.log('User:', response.data)
+      const { data } = await apiClient.user.get()
+      console.log('User:', data)
     } catch (error) {
       console.error('Failed to fetch user:', error)
     }

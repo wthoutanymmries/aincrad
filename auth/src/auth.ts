@@ -46,6 +46,10 @@ export const auth = betterAuth({
         type: 'string',
         required: false,
       },
+      isManager: {
+        type: 'boolean',
+        required: true,
+      },
     },
   },
 })

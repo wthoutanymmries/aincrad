@@ -21,6 +21,7 @@ function RouteComponent() {
       // no way! >~<
       patronymic: formData.middleName,
       image: undefined,
+      isManager: formData.isManager,
     }, {
         onRequest: (ctx) => {
           // loading

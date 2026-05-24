@@ -4,9 +4,8 @@ model User {
   name       String
   surname    String
   patronymic String
+  isManager  Boolean @default(false)
 
-  // login    String @unique
-  // password String
   email         String
   emailVerified Boolean   @default(false)
   image         String?

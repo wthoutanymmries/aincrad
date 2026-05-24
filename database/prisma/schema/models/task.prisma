@@ -14,8 +14,9 @@ enum Status {
 model Task {
   id String @id @default(cuid())
 
-  title        String
-  descripttion String
+  title         String
+  descripttion  String
+  madeByManager Boolean @default(false)
 
   createdAt DateTime
   updatedAt DateTime
