@@ -164,7 +164,7 @@ export function NavMain() {
 
   return (
     <SidebarGroup>
-      <div className='fixed top-18 left-4 w-56 bg-primary-foreground z-50'>
+      <div className='absolute top-0 left-2 w-56 bg-primary-foreground z-50'>
         <SidebarGroupLabel>
           {user?.isManager
             ? 'Manage subordinates'
