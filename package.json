@@ -7,13 +7,17 @@
     "dev": "concurrently \"pnpm dev:client\" \"pnpm dev:server\"",
     "dev:client": "pnpm --filter client dev",
     "dev:server": "pnpm --filter server dev",
-    "build": "pnpm --filter auth run build && pnpm --filter database run build"
+    "build": "pnpm --filter auth run build && pnpm --filter database run build",
+    "knip": "knip"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.24.0",
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "@types/node": "^25.9.1",
+    "concurrently": "^9.2.1",
+    "knip": "^6.14.2",
+    "typescript": "^6.0.3"
   }
 }
