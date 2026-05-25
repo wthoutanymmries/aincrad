@@ -10,44 +10,51 @@ const tasks = new Elysia({ name: 'tasks' })
 	.use(betterAuthPlugin)
 	.get(
 		'/tasks',
-		async ({ user }) => {
-			if (user.isManager) {
-				const tasks = await prisma.task.findMany({
-					orderBy: {
-						ownerId: 'asc'
+		async ({ user, query }) => {
+			const include = { author: true, manager: true } as const
+
+			if (query.endsAt) {
+				return prisma.task.findMany({
+					where: {
+						ownerId: user.id,
+						endsAt: { lte: new Date(query.endsAt) },
 					},
-					include: {
-						author: true,
-						manager: true,
-					},
+					include,
 				})
-				return tasks
 			}
 
-			const tasks = await prisma.task.findMany({
-				where: {
-					ownerId: user.id,
-				},
-				include: {
-					author: true,
-					manager: true,
-				}
+			if (query.all === 'true') {
+				return prisma.task.findMany({ include })
+			}
+
+			if (user.isManager) {
+				return prisma.task.findMany({
+					orderBy: { ownerId: 'asc' },
+					include,
+				})
+			}
+
+			return prisma.task.findMany({
+				where: { ownerId: user.id },
+				include,
 			})
-			return tasks
 		},
 		{
 			auth: true,
+			query: t.Object({
+				all: t.Optional(t.String()),
+				endsAt: t.Optional(t.String()),
+			}),
 		}
 	)
 	.post(
 		'/tasks',
 		async ({ body}) => {
-			const task = await prisma.task.create({
+			return prisma.task.create({
 				data: {
 					...body,
 				},
 			})
-			return task
 		},
 		{
 			auth: true,
@@ -65,7 +72,7 @@ const tasks = new Elysia({ name: 'tasks' })
 	.patch(
 		'/tasks/:id',
 		async ({ params: { id }, body }) => {
-			const task = await prisma.task.update({
+			return prisma.task.update({
 				where: {
 					id,
 				},
@@ -73,8 +80,6 @@ const tasks = new Elysia({ name: 'tasks' })
 					...body
 				},
 			})
-
-			return task
 		},
 		{
 			auth: true,

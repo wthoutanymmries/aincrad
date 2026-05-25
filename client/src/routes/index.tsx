@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-// import { Plus } from 'lucide-react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { AppSidebar } from '@/components/app-sidebar'
 import { Separator } from '@/components/ui/separator'
@@ -9,7 +8,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-// import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -20,11 +18,13 @@ import {
 } from '@/components/ui/table'
 import { Badge } from "@/components/ui/badge"
 import { UserAvatar } from '@/components/user-avatar'
+import { TaskDialog } from '@/components/task-dialog'
+import { DatePicker } from '@/components/date-picker'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { cn } from '@/lib/utils'
 import { apiClient } from '../lib/api-client'
 import { authClient } from '../lib/auth-client'
 import type { Priority, Status } from '@aincrad/database'
-import { TaskDialog } from '@/components/task-dialog'
 
 export const Route = createFileRoute('/')({
   component: Index,
@@ -54,7 +54,11 @@ function PriorityBadge({ priority }: { priority: Priority }) {
   }
 }
 
+type TableView = 'mine' | 'all'
+
 function Index() {
+  // apiClient needs to be initilized before i can use it (?)
+  // mving these type declarations out will break the code
   type Tasks = Awaited<ReturnType<typeof apiClient.tasks.get>>['data']
   type Task = NonNullable<Tasks>[number]
   
@@ -64,6 +68,8 @@ function Index() {
   const [tasks, setTasks] = useState<Tasks>([])
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [editOpen, setEditOpen] = useState(false)
+  const [view, setView] = useState<TableView>('mine')
+  const [endsAt, setEndsAt] = useState<Date | undefined>(undefined)
   const now = new Date(Date.now())
   
 
@@ -89,9 +95,21 @@ function Index() {
   }, [session, error, isPending])
 
 
-  const fetchTasks = async () => {
+  const fetchTasks = async (
+    currentView: TableView = view,
+    currentEndsAt: Date | undefined = endsAt,
+  ) => {
+    const query: Record<string, string> = {}
+
+    if (currentEndsAt) {
+      query.endsAt = currentEndsAt.toISOString()
+    }
+    else if (currentView === 'all') {
+      query.all = 'true'
+    }
+
     try {
-      const { data } = await apiClient.tasks.get()
+      const { data } = await apiClient.tasks.get({ query })
 
       if (!data) {
         return
@@ -111,8 +129,9 @@ function Index() {
   }
 
   useEffect(() => {
-    void fetchTasks()
-  }, [])
+    void fetchTasks(view, endsAt)
+  }, [view, endsAt])
+
 
   const handleDialogOpenChange =
     (open: boolean) => {
@@ -121,6 +140,14 @@ function Index() {
       if (!open) {
         setSelectedTask(null)
       }
+    }
+  const handleTablViewToggleChange =
+    (value: string) => {
+      if (!value) {
+        return
+      }
+
+      setView(value as TableView)
     }
 
   return (
@@ -134,8 +161,25 @@ function Index() {
               orientation='vertical'
               className='mr-2 data-[orientation=vertical]:h-6'
             />
+            <span className='text-sm font-medium'>Dashboard</span>
           </div>
-          <div className='ml-auto mr-4'>
+          <div className='ml-auto mr-4 flex flex-row gap-2'>
+            <ToggleGroup
+              type='single'
+              value={view}
+              onValueChange={handleTablViewToggleChange}
+              variant='outline'
+              spacing={0}
+            >
+              <ToggleGroupItem value='mine'>My tasks</ToggleGroupItem>
+              <ToggleGroupItem value='all'>All tasks</ToggleGroupItem>
+            </ToggleGroup>
+            <DatePicker
+              placeholder='Filter by due date'
+              value={endsAt}
+              onValueChange={setEndsAt}
+              onClear={() => setEndsAt(undefined)}
+            />
             <TaskDialog
               key={selectedTask?.id ?? 'create'}
               fetchTasks={fetchTasks}

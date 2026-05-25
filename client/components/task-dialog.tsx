@@ -313,7 +313,11 @@ export function TaskDialog({
                 </Field>
                 <Field>
                   <Label>Due date</Label>
-                  <DatePicker value={dueDate} onValueChange={setDueDate} disabled={isReadOnly} />
+                  <DatePicker
+                    value={dueDate}
+                    onValueChange={setDueDate}
+                    disabled={isReadOnly}
+                  />
                 </Field>
                 <Field>
                   <Label>Status</Label>
@@ -351,9 +355,13 @@ export function TaskDialog({
               </FieldGroup>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button variant='outline' onClick={setDefaults}>Cancel</Button>
+                  <Button variant='outline' onClick={setDefaults}>
+                    Cancel
+                  </Button>
                 </DialogClose>
-                <Button type='submit' onClick={handleCreateTask}>Save changes</Button>
+                <Button type='submit' onClick={handleCreateTask}>
+                  Save changes
+                </Button>
               </DialogFooter>
             </div>
           </div>
