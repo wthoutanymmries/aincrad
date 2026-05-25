@@ -1,3 +1,5 @@
+import bg from '../assets/2.jpg'
+
 import { useState } from 'react'
 import { LoginForm } from '@/components/login-form'
 
@@ -74,7 +76,7 @@ function LoginPage() {
       </div>
       <div className='relative hidden bg-muted lg:block'>
         <img
-          src='/placeholder.svg'
+          src={bg}
           alt='Image'
           className='absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale'
         />

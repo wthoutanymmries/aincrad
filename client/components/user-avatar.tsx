@@ -8,9 +8,9 @@ interface UserAvatarProps {
 
 export function UserAvatar({ name, surname, image }: UserAvatarProps) {
   return (
-    <Avatar className='h-8 w-8 rounded-lg'>
+    <Avatar className='h-8 w-8 rounded-full'>
       <AvatarImage src={image || '/avatars/shadcn.jpg'} alt={name} />
-      <AvatarFallback className='rounded-lg'>
+      <AvatarFallback className='rounded-full'>
         {name[0].toUpperCase() + surname[0].toUpperCase()}
       </AvatarFallback>
     </Avatar>

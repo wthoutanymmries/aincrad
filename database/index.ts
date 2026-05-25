@@ -18,4 +18,4 @@ export * from "./prisma/generated/prisma/internal/prismaNamespace.js"
 // const prisma = new PrismaClient({})
 
 // const users = await prisma.user.findMany()
-// prisma.task.update()
+// prisma.task.findMany({ orderBy: { updatedAt: 'desc' } })

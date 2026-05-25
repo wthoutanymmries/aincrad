@@ -70,7 +70,9 @@ export function TaskDialog({
 }: TaskDialogProps) {
   const { data: session } = authClient.useSession()
   const user = session?.user
-  const isReadOnly = !!defaultManagerId
+  const isReadOnly = !!defaultManagerId && defaultManagerId !== user?.id
+
+  // console.log(defaultManagerId)
 
   const isOpenControlled = openProp !== undefined
   const [internalOpen, setInternalOpen] = useState(false)
@@ -166,7 +168,7 @@ export function TaskDialog({
       if (!next) setDefaults()
     }
   
-  const handleCreateTask = async () => {
+  const handleSaveTask = async () => {
     if (!session?.user) {
       toast.warning('No user session found', {
         description: 'Please log in to create a task',
@@ -187,6 +189,21 @@ export function TaskDialog({
     const endsAt = dueDate ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     const endsAtPatch = dueDate ?? null
     const ownerId = selectedSubordinateId ?? session.user.id
+
+    const isManagerNotAllowedToEdit =
+      (defaultManagerId && defaultManagerId !== user?.id)
+      || (!defaultManagerId && user?.id !== ownerId)
+    
+    if (isManagerNotAllowedToEdit) {
+      toast.warning('Edit not allowed', {
+        description: 'This person is not your subordinate',
+        action: {
+          label: 'Close',
+          onClick: () => {},
+        },
+      })
+      return
+    }
 
     try {
       if (taskId) {
@@ -359,7 +376,7 @@ export function TaskDialog({
                     Cancel
                   </Button>
                 </DialogClose>
-                <Button type='submit' onClick={handleCreateTask}>
+                <Button type='submit' onClick={handleSaveTask}>
                   Save changes
                 </Button>
               </DialogFooter>

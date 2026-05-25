@@ -171,7 +171,7 @@ function Index() {
               variant='outline'
               spacing={0}
             >
-              <ToggleGroupItem value='mine'>My tasks</ToggleGroupItem>
+              <ToggleGroupItem value='mine'>My visible</ToggleGroupItem>
               <ToggleGroupItem value='all'>All tasks</ToggleGroupItem>
             </ToggleGroup>
             <DatePicker
@@ -222,7 +222,7 @@ function Index() {
                   <TableCell>
                     <div className={cn(
                       'rounded-full size-2',
-                      task.endsAt < now
+                      task.endsAt < now && task.status !== 'FINISHED'
                         ? 'bg-red-500'
                         : task.status === 'FINISHED'
                           ? 'bg-green-600'

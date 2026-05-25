@@ -1,3 +1,5 @@
+import bg from '../assets/2.jpg'
+
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { GalleryVerticalEnd } from 'lucide-react'
 import { SignupForm, type TSignUpFormData } from '@/components/signup-form'
@@ -53,7 +55,7 @@ function RouteComponent() {
       </div>
       <div className='relative hidden bg-muted lg:block'>
         <img
-          src='/placeholder.svg'
+          src={bg}
           alt='Image'
           className='absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale'
         />

@@ -19,12 +19,16 @@ const tasks = new Elysia({ name: 'tasks' })
 						ownerId: user.id,
 						endsAt: { lte: new Date(query.endsAt) },
 					},
+					orderBy: { updatedAt: 'desc' },
 					include,
 				})
 			}
 
 			if (query.all === 'true') {
-				return prisma.task.findMany({ include })
+				return prisma.task.findMany({
+					orderBy: { updatedAt: 'desc' },
+					include,
+				})
 			}
 
 			if (user.isManager) {
@@ -36,6 +40,7 @@ const tasks = new Elysia({ name: 'tasks' })
 
 			return prisma.task.findMany({
 				where: { ownerId: user.id },
+				orderBy: { updatedAt: 'desc' },
 				include,
 			})
 		},
@@ -71,7 +76,15 @@ const tasks = new Elysia({ name: 'tasks' })
 	)
 	.patch(
 		'/tasks/:id',
-		async ({ params: { id }, body }) => {
+		async ({ params: { id }, body, user }) => {
+			const isManagerNotAllowedToEdit =
+				(body.managerId && body.managerId !== user.id)
+				|| (!body.managerId && user.id !== body.ownerId)
+
+			if (isManagerNotAllowedToEdit) {
+				throw new Error('Not your subordinate.')
+			}
+
 			return prisma.task.update({
 				where: {
 					id,
